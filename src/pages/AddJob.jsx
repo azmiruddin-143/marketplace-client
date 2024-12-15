@@ -2,9 +2,12 @@ import { useContext, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { AuthContext } from '../providers/AuthProvider'
+import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
 const AddJob = () => {
   const {user} = useContext(AuthContext)
+  const navigate = useNavigate()
   const [selectedDate, setSelectedDate] = useState("");
   const handleDateChange = (date) => {
     if (date) {
@@ -38,6 +41,9 @@ const AddJob = () => {
     })
       .then(res => res.json())
       .then(data => {
+        from.reset()
+        toast.success("Data Added successfully")
+        navigate("/my-posted-jobs")
         console.log(data);
       })
 
