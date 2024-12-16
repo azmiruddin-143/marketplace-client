@@ -8,17 +8,8 @@ import { useNavigate } from 'react-router-dom'
 const AddJob = () => {
   const {user} = useContext(AuthContext)
   const navigate = useNavigate()
-  const [selectedDate, setSelectedDate] = useState("");
-  const handleDateChange = (date) => {
-    if (date) {
-      const formattedDate = date.toLocaleDateString("en-US", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "2-digit",
-      });
-      setSelectedDate(formattedDate); // Update state with formatted date
-    }
-  };
+  const [startDate, setStartDate] = useState(new Date())
+  console.log(startDate);
 
   const addJonbs = (e) => {
     e.preventDefault()
@@ -29,8 +20,8 @@ const AddJob = () => {
     const min_price = from.min_price.value
     const max_price = from.max_price.value
     const description = from.description.value
-    const jobObj = {job_title, email, selectedDate, category, min_price, max_price, description }
-
+    const jobObj = {job_title, email, startDate, category, min_price, max_price, description }
+   console.log(jobObj);
 
     fetch("http://localhost:9000/jobs", {
       method: "POST",
@@ -86,14 +77,11 @@ const AddJob = () => {
             <div className='flex flex-col gap-2 '>
               <label className='text-gray-700'>Deadline</label>
 
-              {/* Date Picker Input Field */}
-              <DatePicker
-                selected={selectedDate}
-                required
-                onChange={handleDateChange}
-                dateFormat="MM/dd/yy" // Show date in this format in UI
-                placeholderText="Select Date"
-                className="input input-bordered w-full"
+               {/* Date Picker Input Field */}
+               <DatePicker
+                className='border p-2 rounded-md'
+                selected={startDate}
+                onChange={date => setStartDate(date)}
               />
             </div>
 

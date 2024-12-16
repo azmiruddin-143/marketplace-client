@@ -1,9 +1,53 @@
-import { useState } from 'react'
+
+import { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import { useParams } from 'react-router-dom'
+
 
 const UpdateJob = () => {
   const [startDate, setStartDate] = useState(new Date())
+  const { id } = useParams()
+  const [job, setJob] = useState([])
+
+  useEffect(() => {
+    fetch(`http://localhost:9000/jobsingle/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        setJob(data)
+        setStartDate(new Date(data.startDate))
+      })
+  }, [id])
+
+
+
+
+
+  const updateForm =(e) =>{
+    e.preventDefault()
+    const from = e.target
+    const job_title = from.job_title.value
+    const email = from.email.value
+    const category = from.category.value
+    const min_price = from.min_price.value
+    const max_price = from.max_price.value
+    const description = from.description.value
+    const updateObj = {job_title, email, startDate, category, min_price, max_price, description }
+     
+    fetch(`http://localhost:9000/jobsingle/${id}`,{
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updateObj)
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log(data);
+    })
+  }
+
+
 
   return (
     <div className='flex justify-center items-center min-h-[calc(100vh-306px)] my-12'>
@@ -12,7 +56,7 @@ const UpdateJob = () => {
           Update a Job
         </h2>
 
-        <form>
+        <form onSubmit={updateForm}>
           <div className='grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2'>
             <div>
               <label className='text-gray-700 ' htmlFor='job_title'>
@@ -20,6 +64,7 @@ const UpdateJob = () => {
               </label>
               <input
                 id='job_title'
+                defaultValue={job.job_title}
                 name='job_title'
                 type='text'
                 className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
@@ -33,6 +78,7 @@ const UpdateJob = () => {
               <input
                 id='emailAddress'
                 type='email'
+                defaultValue={job.email}
                 name='email'
                 disabled
                 className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
@@ -41,6 +87,7 @@ const UpdateJob = () => {
             <div className='flex flex-col gap-2 '>
               <label className='text-gray-700'>Deadline</label>
 
+              {/* Date Picker Input Field */}
               <DatePicker
                 className='border p-2 rounded-md'
                 selected={startDate}
@@ -48,26 +95,32 @@ const UpdateJob = () => {
               />
             </div>
 
-            <div className='flex flex-col gap-2 '>
-              <label className='text-gray-700 ' htmlFor='category'>
-                Category
-              </label>
-              <select
-                name='category'
-                id='category'
-                className='border p-2 rounded-md'
-              >
-                <option value='Web Development'>Web Development</option>
-                <option value='Graphics Design'>Graphics Design</option>
-                <option value='Digital Marketing'>Digital Marketing</option>
-              </select>
-            </div>
+            {
+              job.category && (
+                <div className='flex flex-col gap-2 '>
+                  <label className='text-gray-700 ' htmlFor='category'>
+                    Category
+                  </label>
+                  <select
+                    name='category'
+                    id='category'
+                    defaultValue={job.category}
+                    className='border p-2 rounded-md'
+                  >
+                    <option value='Web Development'>Web Development</option>
+                    <option value='Graphics Design'>Graphics Design</option>
+                    <option value='Digital Marketing'>Digital Marketing</option>
+                  </select>
+                </div>
+              )
+            }
             <div>
               <label className='text-gray-700 ' htmlFor='min_price'>
                 Minimum Price
               </label>
               <input
                 id='min_price'
+                defaultValue={job.min_price}
                 name='min_price'
                 type='number'
                 className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
@@ -81,6 +134,7 @@ const UpdateJob = () => {
               <input
                 id='max_price'
                 name='max_price'
+                defaultValue={job.max_price}
                 type='number'
                 className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
               />
@@ -93,6 +147,7 @@ const UpdateJob = () => {
             <textarea
               className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
               name='description'
+              defaultValue={job.description}
               id='description'
               cols='30'
             ></textarea>
